@@ -1,7 +1,8 @@
 import { Text, Button, View, StyleSheet, TextInput, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import { collection, query, where, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { db } from "./../../../utils/firebase.js";
 
 const EditarPerfil = ({ navigation, usuario }) => {
@@ -15,6 +16,8 @@ const EditarPerfil = ({ navigation, usuario }) => {
         sexo: "",
     });
     const [datosOriginales, setDatosOriginales] = useState({});
+    const auth = getAuth();
+    const user = auth.currentUser;
 
     const obtenerEmpleadoPorId = async (docId) => {
         try {
@@ -37,18 +40,19 @@ const EditarPerfil = ({ navigation, usuario }) => {
     };
 
     const handleUpdate = async () => {
-        const { Nombre, Apellido_Paterno, Apellido_Materno, sexo, Correo, Contraseña } = datosCompletos;
+        const { Nombre, Apellido_Paterno, Apellido_Materno, sexo, } = datosCompletos;
 
-        // Comparar los datos actuales con los originales
+        if (!Nombre || !Apellido_Paterno || !Apellido_Materno || !sexo ) {
+            alert("Todos los campos son obligatorios.");
+            return;
+        }
+
         if (
             Nombre === datosOriginales.Nombre &&
             Apellido_Paterno === datosOriginales.Apellido_Paterno &&
             Apellido_Materno === datosOriginales.Apellido_Materno &&
-            sexo === datosOriginales.sexo &&
-            Correo === datosOriginales.Correo &&
-            Contraseña === datosOriginales.Contraseña
+            sexo === datosOriginales.sexo 
         ) {
-           
             alert("No hay cambios, no se realiza la actualización.");
             return; // No hacer nada si no hay cambios
         }
@@ -62,10 +66,8 @@ const EditarPerfil = ({ navigation, usuario }) => {
                 Apellido_Paterno,
                 Apellido_Materno,
                 sexo,
-                Correo,
-                Contraseña,
             });
-            setDatosOriginales(datosCompletos)
+            setDatosOriginales(datosCompletos);
             alert('Datos actualizados correctamente');
         } catch (error) {
             console.error('Error al actualizar los datos:', error);
@@ -82,6 +84,7 @@ const EditarPerfil = ({ navigation, usuario }) => {
         newData[campo] = newValue;
         setDatosCompletos(newData);
     };
+
 
     return (
         <View style={styles.container}>
@@ -119,21 +122,6 @@ const EditarPerfil = ({ navigation, usuario }) => {
                     <Picker.Item label="Femenino" value="Femenino" />
                 </Picker>
             </View>
-            <TextInput
-                style={styles.input}
-                placeholder="Ingresa tu correo"
-                placeholderTextColor="#fff"
-                value={datosCompletos.Correo}
-                onChangeText={(nv) => updateDatosCom(nv, "Correo")}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="********"
-                value={datosCompletos.Contraseña} // Mostrar la contraseña actual
-                placeholderTextColor="#fff"
-                secureTextEntry
-                onChangeText={(nv) => updateDatosCom(nv, "Contraseña")}
-            />
             <Button title="Guardar Cambios" onPress={handleUpdate} />
         </View>
     );

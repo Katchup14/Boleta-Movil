@@ -26,7 +26,7 @@ const TabNavigator = ({usuario}) => {
   );
 };
 
-const InicioDoc = ({usuario}) => {
+const InicioDoc = ({usuario,signout}) => {
   const Drawer = createDrawerNavigator();
   return (
     <NavigationContainer>
@@ -38,13 +38,11 @@ const InicioDoc = ({usuario}) => {
               <EditarPerfil usuario={usuario}/>
           )}
         </Drawer.Screen>
-        <Drawer.Screen name="Cerrar Sesión">
-          {() => (
-            <View style={styles.container}>
-              <Text>Ayuda</Text>
-            </View>
-          )}
-        </Drawer.Screen>
+        <Drawer.Screen name="Cerrar Sesión"
+         children={() => {
+          signout(); 
+          return null; 
+        }}/>
       </Drawer.Navigator>
     </NavigationContainer>
   );

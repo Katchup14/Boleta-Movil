@@ -1,11 +1,13 @@
 import { React, useEffect, useState } from 'react';
-import { StyleSheet, Text, View,ScrollView  } from 'react-native';
+import { StyleSheet, Text, View,ScrollView,TouchableOpacity,Modal,Button  } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "./../../../utils/firebase.js";
 
 
 const MisCursos = ({ navigation, usuario }) => {
   const [cursos, setCursos] = useState([])
+  const [modalVisible, setModalVisible] = useState(false);
+  const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
 
 
   useEffect(() => {
@@ -27,20 +29,48 @@ const MisCursos = ({ navigation, usuario }) => {
 
   }, [cursos])
 
+  const abrirModal = (curso) => {
+    setCursoSeleccionado(curso);
+    setModalVisible(true);
+  };
+
+  const cerrarModal = () => {
+    setModalVisible(false);
+    setCursoSeleccionado(null);
+  };
 
   return (
+    <>
     <View style={styles.container}>
       <Text style={styles.title}>Mis Cursos</Text>
       <ScrollView style={styles.scroll}>
         {cursos.map(curso => (
-          <View key={curso.id} style={styles.card}>
+          <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
             <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
             <Text style={styles.subject}>Materia: {curso.Materia}</Text>
             <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
+    {cursoSeleccionado && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={cerrarModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Detalles del Curso</Text>
+              <Text>Nombre: {cursoSeleccionado.Nombre}</Text>
+              <Text style={[styles.modalTitle,styles.plus]}>{cursoSeleccionado.Codigo}</Text>
+              <Button title="Cerrar" onPress={cerrarModal} />
+            </View>
+          </View>
+        </Modal>
+      )}
+    </>
   );
 }
 
@@ -84,4 +114,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#888',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#e6e6e6', // Gris ligeramente más oscuro
+    borderColor: '#000',        // Borde blanco
+    borderWidth: 1,             // Grosor del borde
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',        // Sombra negra
+    shadowOffset: { width: 0, height: 4 }, // Desplazamiento de la sombra
+    shadowOpacity: 0.3,         // Opacidad de la sombra
+    shadowRadius: 5,            // Radio de la sombra
+    elevation: 6,               // Para sombras en Android
+  },  
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  plus:{
+    fontSize: 40,
+  }
 });

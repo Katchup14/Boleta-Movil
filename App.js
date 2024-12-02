@@ -31,12 +31,20 @@ export default function App() {
 
   }, []);
 
+  const signout = () => {
+    const auth = getAuth(app);
+    signOut(auth).then(() => {
+      console.log('Se cerró la sesión');
+    }).catch((error) => {
+      console.log('Error al cerrar sesión', error);
+    });
+  };
 
   if (user === null) return null; // Muestra nada mientras se espera el estado de autenticación
 
   return (
     <View style={styles.container}>
-     {user ? <App2 rol={rol} usuario={usuario}/> : <Auth setRol={setRol} setUsuario={setUsuario}/>}
+     {user ? <App2 rol={rol} usuario={usuario} signout={signout}/> : <Auth setRol={setRol} setUsuario={setUsuario}/>}
     </View>
   );
 }

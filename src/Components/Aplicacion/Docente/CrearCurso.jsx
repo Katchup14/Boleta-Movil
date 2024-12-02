@@ -18,6 +18,12 @@ const CrearCurso = ({ navigaion, usuario }) => {
 
     const newCurso= async ()=>{
         const cod=codigo()
+        const {Materia,Nombre,Año} = data;
+
+        if (!Materia || !Nombre || !Año ||!cod ) {
+            alert("Todos los campos son obligatorios.");
+            return;
+        }
         try{
         const userCollection = collection(db, "cursos");
                 await addDoc(userCollection, {

@@ -1,11 +1,14 @@
 import { React, useEffect, useState } from 'react';
-import { StyleSheet, Text, View,ScrollView  } from 'react-native';
+import { StyleSheet, Text, View,ScrollView,TouchableOpacity,Modal,Button  } from 'react-native';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "./../../../utils/firebase.js";
+import Boleta from './Boleta.jsx';
 
 
-const VerEstudiante = ({ navigation, usuario }) => {
+const MisCursos = ({ navigation, usuario }) => {
   const [cursos, setCursos] = useState([])
+  const [boleta, setBoleta] = useState(false);
+  const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
 
 
   useEffect(() => {
@@ -27,23 +30,32 @@ const VerEstudiante = ({ navigation, usuario }) => {
 
   }, [cursos])
 
+  const abrirModal = (curso) => {
+    setCursoSeleccionado(curso);
+    setBoleta(true);
+  };
+
 
   return (
+    <>
+    {boleta ?   <Boleta cursoSeleccionado={cursoSeleccionado} setBoleta={setBoleta}/> :
     <View style={styles.container}>
       <Text style={styles.title}>Mis Boletas</Text>
       <ScrollView style={styles.scroll}>
         {cursos.map(curso => (
-          <View key={curso.id} style={styles.card}>
+          <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
             <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
             <Text style={styles.subject}>Materia: {curso.Materia}</Text>
-          </View>
+            <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
+          </TouchableOpacity>
         ))}
       </ScrollView>
-    </View>
+    </View>}
+    </>
   );
 }
 
-export default VerEstudiante;
+export default MisCursos;
 
 const styles = StyleSheet.create({
   container: {
@@ -82,5 +94,29 @@ const styles = StyleSheet.create({
   status: {
     fontSize: 16,
     color: '#888',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#e6e6e6', // Gris ligeramente más oscuro
+    borderColor: '#000',        // Borde blanco
+    borderWidth: 1,             // Grosor del borde
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+    shadowColor: '#000',        // Sombra negra
+    shadowOffset: { width: 0, height: 4 }, // Desplazamiento de la sombra
+    shadowOpacity: 0.3,         // Opacidad de la sombra
+    shadowRadius: 5,            // Radio de la sombra
+    elevation: 6,               // Para sombras en Android
+  },  
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
   },
 });

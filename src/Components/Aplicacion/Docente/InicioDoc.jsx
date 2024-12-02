@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput,Button } from 'react-native';
-import Colors from './utils/colors';
+import Colors from '../utils/colors';
 
-const Form = ({ signout }) => {
+const InicioDoc = ({ signout }) => {
     //destructuración de props
 
 
@@ -11,11 +11,7 @@ const Form = ({ signout }) => {
     return (
         <>
             <View style={styles.viewForms}>
-            <Button
-                    title='CerrarSesion'
-                    onPress={signout}
-                    ></Button>
-                   
+            <Text>Eres un Docente</Text>
             </View>
 
         </>
@@ -62,4 +58,4 @@ const pickerStyles = StyleSheet.create({
 
 })
 
-export default Form;
+export default InicioDoc;

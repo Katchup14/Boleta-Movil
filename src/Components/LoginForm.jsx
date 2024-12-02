@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button, Text, StyleSheet, TextInput, View } from "react-native";
 
-import app from '../utils/firebase.js'
-
+import {app,db} from '../utils/firebase.js'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 
 export default function LoginForm(
     {
-        changeForm = () => { }
+        changeForm = () => { },setRol
     }
 ) {
 
@@ -19,26 +20,33 @@ export default function LoginForm(
         setData(newData)
     }
 
-    const singin = () => {
-
-        const { email, password } = data
-
-        const auth = getAuth(app);
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // Signed in 
-                const user = userCredential.user;
-                console.log('logeado', user)
-                // ...
-            })
-            .catch((error) => {
-                console.log('error')
-                const errorCode = error.code;
-                const errorMessage = error.message;
-            });
-
+    const singin = async () => {
+        const { email, password } = data;
+        try {
+            const auth = getAuth(app);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password); // Usamos await aquí
+    
+            const user = userCredential.user;  // El usuario autenticado
+            const usersCollection = collection(db, "usuarios");
+            const q = query(usersCollection, where("Correo", "==", email));
+            
+            const querySnapshot = await getDocs(q); // Ahora utilizamos await aquí
+    
+            if (!querySnapshot.empty) {
+                const userDoc = querySnapshot.docs[0].data();
+                const rol = userDoc.rol;  // Suponiendo que tienes un campo "rol"
+                console.log(rol)
+                await AsyncStorage.setItem('rol', rol);
+                setRol(rol)
+                return rol;
+            } else {
+                console.log("No se encontró el usuario con el correo proporcionado");
+            }
+        } catch (error) {
+            console.log('Error:', error.message);
+        }
     }
-
+    
     console.log(data)
 
     return (

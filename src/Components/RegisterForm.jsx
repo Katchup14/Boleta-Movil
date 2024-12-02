@@ -1,22 +1,25 @@
 import { Text, Button, View, StyleSheet, TextInput } from "react-native";
 import { Picker } from '@react-native-picker/picker';
-import Input from "../Input";
 import { useState } from "react";
 
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { app,db } from "./../utils/firebase.js";
+import { collection, addDoc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import app from "./../utils/firebase.js";
+
 
 import { validateEmail } from "../controller";
 
-export default function RegisterForm(
+export default function RegisterForm (
     {
-        changeForm = () => { }
+        changeForm = () => { },setRol
     }
 ) {
+    const [rolI,setRolI] = useState('')
     const [sexo, setSexo] = useState('');
-    const [rol, setRol] = useState('');
     const [data, setData] = useState({ email: '', password: '', confirmPassword: '' })
+    const [datosCompletos, setDatosCompletos] = useState({ Nombre: '', Apellido_Paterno: '', Apellido_Materno: '', Contraseña: '', Correo: '', rol: '', sexo: '' })
 
     const [error, setError] = useState({ emailE: '', passwordE: '', confirmPasswordE: '' })
 
@@ -26,43 +29,74 @@ export default function RegisterForm(
         setData(newData)
     }
 
-    const check = () => {
-
-        const { email, password, confirmPassword } = data
-        console.log('data', Boolean(email), email, password, confirmPassword)
-        let newError = { emailE: '', passwordE: '', confirmPasswordE: '' }
-
-        if (!email) { newError.emailE = 'El email es obligatorio' }
-        else if (!validateEmail(email)) { newError.emailE = 'El email no es valido' }
-        if (!password) { newError.passwordE = 'El password es obligatorio' }
-        else if (password.length <= 6) { newError.passwordE = 'El password debe ser mayor a 6 caracteres' }
-        if (!confirmPassword) { newError.confirmPasswordE = 'Debes confirmal el password' }
-        else if (confirmPassword.length <= 6) { newError.confirmPasswordE = 'La confirmacion debe ser mayor a 6 caracteres' }
-
-        if (!newError.emailE || !newError.passwordE || !newError.confirmPasswordE) {
-            console.log('----------n no hay errores -----------')
-            const auth = getAuth(app);
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Signed up 
-                    const user = userCredential.user;
-                    // ...
-                    console.log('user agregado: ', user)
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    // ..
-                });
-        }
-
-        setError(newError)
-
-
+    const updateDatosCom = (newValue, campo) => {
+        const newData = { ...datosCompletos }
+        newData[campo] = newValue
+        setDatosCompletos(newData)
     }
 
-    console.log("Object Data:", data)
-    console.log("Error:", error)
+    const validateData = (data) => {
+        const { email, password, confirmPassword } = data;
+        let newError = { emailE: '', passwordE: '', confirmPasswordE: '' };
+
+        if (!email) {
+            newError.emailE = 'El email es obligatorio';
+        } else if (!validateEmail(email)) {
+            newError.emailE = 'El email no es valido';
+        }
+
+        if (!password) {
+            newError.passwordE = 'El password es obligatorio';
+        } else if (password.length <= 6) {
+            newError.passwordE = 'El password debe ser mayor a 6 caracteres';
+        }
+
+        if (!confirmPassword) {
+            newError.confirmPasswordE = 'Debes confirmar el password';
+        } else if (confirmPassword.length <= 6) {
+            newError.confirmPasswordE = 'La confirmación debe ser mayor a 6 caracteres';
+        }
+
+        return newError;
+    };
+
+    const registerUser = async (email, password, datosCompletos) => {
+        const auth = getAuth(app);
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            const userCollection = collection(db, "usuarios");
+            await addDoc(userCollection, {
+                Nombre: datosCompletos.Nombre,
+                Apellido_Paterno: datosCompletos.Apellido_Paterno,
+                Apellido_Materno: datosCompletos.Apellido_Materno,
+                rol: datosCompletos.rol,
+                sexo: datosCompletos.sexo,
+                Correo:email,
+                Contraseña:password
+            });
+            console.log("Usuario agregado exitosamente.");
+            await AsyncStorage.setItem('rol', datosCompletos.rol);
+            setRol(datosCompletos.rol)
+        } catch (error) {
+            console.error("Error al guardar el empleado:", error);
+            alert("Error al guardar los datos. Intenta nuevamente.");
+        }
+    };
+
+    const check = async () => {
+        const { email, password, confirmPassword } = data;
+        const newError = validateData(data);
+        setError(newError);
+
+        if (!newError.emailE && !newError.passwordE && !newError.confirmPasswordE) {
+            console.log('---------- No hay errores -----------');
+            await registerUser(email, password, datosCompletos);
+        }else{
+            if(newError.emailE) alert(newError.emailE)
+            if(newError.passwordE) alert(newError.confirmPasswordE)
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -70,27 +104,26 @@ export default function RegisterForm(
                 style={styles.input}
                 placeholder="Nombre"
                 placeholderTextColor='#fff'
-                onChangeText={nv => { updateData(nv, 'email') }}
+                onChangeText={nv => { updateDatosCom(nv, 'Nombre') }}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Apellido Paterno"
                 placeholderTextColor='#fff'
-                onChangeText={nv => { updateData(nv, 'email') }}
+                onChangeText={nv => { updateDatosCom(nv, 'Apellido_Paterno') }}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Apellido Materno"
                 placeholderTextColor='#fff'
-                onChangeText={nv => { updateData(nv, 'email') }}
+                onChangeText={nv => { updateDatosCom(nv, 'Apellido_Materno') }}
             />
-            {/* Dropdown para Rol */}
             <View style={styles.selectContainer}>
                 <Picker
-                    selectedValue={rol}
+                    selectedValue={rolI}
                     style={styles.picker}
-                    onValueChange={(itemValue) => setRol(itemValue)}
-                >   
+                    onValueChange={nv => { updateDatosCom(nv, 'rol') }}
+                >
                     <Picker.Item label=" Rol" value="" />
                     <Picker.Item label="Docente" value="Docente" />
                     <Picker.Item label="Estudiante" value="Estudiante" />
@@ -98,7 +131,7 @@ export default function RegisterForm(
                 <Picker
                     selectedValue={sexo}
                     style={styles.picker}
-                    onValueChange={(itemValue) => setSexo(itemValue)}
+                    onValueChange={nv => { updateDatosCom(nv, 'sexo') }}
                 >
                     <Picker.Item label="sexo" value="" />
                     <Picker.Item label="Masculino" value="Masculino" />

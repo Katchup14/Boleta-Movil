@@ -3,9 +3,8 @@ import { Text, View, Image, StyleSheet, Button } from "react-native";
 
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
-import App2 from "./Aplicacion/App2";
 
-export default function Auth() {
+export default function Auth({setRol}) {
 
     const [isLogin, setIsLogin] = useState(true)
     const [appl, setAPPl] = useState(true)
@@ -14,14 +13,14 @@ export default function Auth() {
         setIsLogin(!isLogin)
     }
 
-
+    
 
     return (
         <>
             <View style={styles.view}>
                 <Image style={styles.logo} source={require('../../assets/Logo.png')} />
                 {
-                    isLogin ? <LoginForm changeForm={changeForm} /> : <RegisterForm changeForm={changeForm} />
+                    isLogin ? <LoginForm changeForm={changeForm} setRol={setRol} /> : <RegisterForm changeForm={changeForm} setRol={setRol}/>
                 }
             </View>
         </>

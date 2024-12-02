@@ -1,16 +1,44 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { React, useEffect, useState } from 'react';
+import { StyleSheet, Text, View,ScrollView  } from 'react-native';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from "./../../../utils/firebase.js";
 
-const VerEstudiante = ({navigation}) => {
+
+const VerEstudiante = ({ navigation, usuario }) => {
+  const [cursos, setCursos] = useState([])
+
+
+  useEffect(() => {
+    const obtenerEmpleados = async () => {
+      try {
+        const q = query(collection(db, 'cursos'), where('id_profesor', '==', usuario.id));
+        const querySnapshot = await getDocs(q);
+        const cursosData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCursos(cursosData);
+      } catch (error) {
+        console.error('Error al obtener los empleados: ', error);
+      }
+    };
+
+    obtenerEmpleados();
+
+  }, [cursos])
+
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mis Cursos</Text>
-      <View style={styles.card}>
-        <Text style={styles.courseName}>Curso: Matemáticas</Text>
-        <Text style={styles.subject}>Materia: Álgebra</Text>
-        <Text style={styles.status}>Estatus: En curso</Text>
-      </View>
-      
+      <Text style={styles.title}>Mis Boletas</Text>
+      <ScrollView style={styles.scroll}>
+        {cursos.map(curso => (
+          <View key={curso.id} style={styles.card}>
+            <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
+            <Text style={styles.subject}>Materia: {curso.Materia}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -28,7 +56,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-    color:'#fff',
+    color: '#fff',
   },
   card: {
     backgroundColor: 'white',

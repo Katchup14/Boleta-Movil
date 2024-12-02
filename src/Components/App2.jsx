@@ -8,10 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function App2({ signout,rol,usuario }) {
-console.log(usuario)
   return (
     <>
-      {rol === "Docente" && <InicioDoc />}
+      {rol === "Docente" && <InicioDoc usuario={usuario}/>}
       {rol === "Estudiante" && <InicioEst />}
       {!["Docente", "Estudiante"].includes(rol) && (
         <Text>Rol no válido o no especificado</Text>

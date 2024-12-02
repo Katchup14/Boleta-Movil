@@ -8,32 +8,34 @@ import CrearCurso from './CrearCurso';
 import VerEstudiante from './VerEstudiante';
 import EditarPerfil from './EditarPerfil';
 
-const TabNavigator = () => {
+const TabNavigator = ({usuario}) => {
   const Tab = createBottomTabNavigator();
-
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false, // Ocultar el header en las pantallas de las tabs
       }}
     >
-      <Tab.Screen name="Mis Cursos" component={MisCursos} />
-      <Tab.Screen name="Crear Curso" component={CrearCurso} />
-      <Tab.Screen name="Ver Estudiantes" component={VerEstudiante} />
+      <Tab.Screen name="Mis Cursos" 
+      children={() => <MisCursos usuario={usuario}/>}/>
+      <Tab.Screen name="Crear Curso"
+      children={() => <CrearCurso usuario={usuario}/>}/>
+      <Tab.Screen name="Ver Estudiantes"
+       children={() => <VerEstudiante usuario={usuario}/>}/>
     </Tab.Navigator>
   );
 };
 
-const InicioDoc = () => {
+const InicioDoc = ({usuario}) => {
   const Drawer = createDrawerNavigator();
-
   return (
     <NavigationContainer>
         <Drawer.Navigator initialRouteName="Inicio">
-        <Drawer.Screen name="Inicio" component={TabNavigator} />
+        <Drawer.Screen name="Inicio" 
+        children={() => <TabNavigator usuario={usuario}/>}/>
         <Drawer.Screen name="Editar Perfil">
           {() => (
-              <EditarPerfil/>
+              <EditarPerfil usuario={usuario}/>
           )}
         </Drawer.Screen>
         <Drawer.Screen name="Cerrar Sesión">

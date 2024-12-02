@@ -13,7 +13,7 @@ import { validateEmail } from "../controller";
 
 export default function RegisterForm (
     {
-        changeForm = () => { },setRol
+        changeForm = () => { },setRol,setUsuario
     }
 ) {
     const [rolI,setRolI] = useState('')
@@ -23,6 +23,7 @@ export default function RegisterForm (
 
     const [error, setError] = useState({ emailE: '', passwordE: '', confirmPasswordE: '' })
 
+    
     const updateData = (newValue, campo) => {
         const newData = { ...data }
         newData[campo] = newValue
@@ -66,7 +67,8 @@ export default function RegisterForm (
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             const userCollection = collection(db, "usuarios");
-            await addDoc(userCollection, {
+            const docRef = await addDoc(userCollection, {
+                uid: user.uid,
                 Nombre: datosCompletos.Nombre,
                 Apellido_Paterno: datosCompletos.Apellido_Paterno,
                 Apellido_Materno: datosCompletos.Apellido_Materno,
@@ -75,9 +77,12 @@ export default function RegisterForm (
                 Correo:email,
                 Contraseña:password
             });
-            console.log("Usuario agregado exitosamente.");
             await AsyncStorage.setItem('rol', datosCompletos.rol);
             setRol(datosCompletos.rol)
+            setUsuario({"id":docRef.id,
+                        "Nombre":datosCompletos.Nombre,
+                        "ApellidoP":datosCompletos.Apellido_Paterno,
+                        "ApellidoM":datosCompletos.Apellido_Materno})
         } catch (error) {
             console.error("Error al guardar el empleado:", error);
             alert("Error al guardar los datos. Intenta nuevamente.");

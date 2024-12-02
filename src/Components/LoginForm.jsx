@@ -8,7 +8,7 @@ import { getFirestore, collection, query, where, getDocs } from "firebase/firest
 
 export default function LoginForm(
     {
-        changeForm = () => { },setRol
+        changeForm = () => { },setRol,setUsuario
     }
 ) {
 
@@ -24,7 +24,7 @@ export default function LoginForm(
         const { email, password } = data;
         try {
             const auth = getAuth(app);
-            const userCredential = await signInWithEmailAndPassword(auth, email, password); // Usamos await aquí
+            const userCredential = await signInWithEmailAndPassword(auth, email, password); 
     
             const user = userCredential.user;  // El usuario autenticado
             const usersCollection = collection(db, "usuarios");
@@ -33,9 +33,13 @@ export default function LoginForm(
             const querySnapshot = await getDocs(q); // Ahora utilizamos await aquí
     
             if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0].data();
-                const rol = userDoc.rol;  // Suponiendo que tienes un campo "rol"
-                console.log(rol)
+                const userDoc = querySnapshot.docs[0];
+                const rol = userDoc.data().rol;  // Suponiendo que tienes un campo "rol"
+                setUsuario({"Nombre":userDoc.data().Nombre,
+                            "ApellidoP":userDoc.data().Apellido_Paterno,
+                            "ApellidoM":userDoc.data().Apellido_Materno,
+                            "id":userDoc.id
+                        })
                 await AsyncStorage.setItem('rol', rol);
                 setRol(rol)
                 return rol;

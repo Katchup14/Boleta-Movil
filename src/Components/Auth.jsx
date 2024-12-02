@@ -4,7 +4,7 @@ import { Text, View, Image, StyleSheet, Button } from "react-native";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
-export default function Auth({setRol}) {
+export default function Auth({setRol,setUsuario}) {
 
     const [isLogin, setIsLogin] = useState(true)
     const [appl, setAPPl] = useState(true)
@@ -20,7 +20,7 @@ export default function Auth({setRol}) {
             <View style={styles.view}>
                 <Image style={styles.logo} source={require('../../assets/Logo.png')} />
                 {
-                    isLogin ? <LoginForm changeForm={changeForm} setRol={setRol} /> : <RegisterForm changeForm={changeForm} setRol={setRol}/>
+                    isLogin ? <LoginForm changeForm={changeForm} setRol={setRol} setUsuario={setUsuario}/> : <RegisterForm changeForm={changeForm} setRol={setRol} setUsuario={setUsuario}/>
                 }
             </View>
         </>

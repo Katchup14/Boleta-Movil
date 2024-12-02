@@ -1,61 +1,61 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput,Button } from 'react-native';
-import Colors from '../utils/colors';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import MisCursos from './MisCursos';
+import CrearCurso from './CrearCurso';
+import VerEstudiante from './VerEstudiante';
+import EditarPerfil from './EditarPerfil';
 
-const InicioDoc = ({ signout }) => {
-    //destructuración de props
+const TabNavigator = () => {
+  const Tab = createBottomTabNavigator();
 
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false, // Ocultar el header en las pantallas de las tabs
+      }}
+    >
+      <Tab.Screen name="Mis Cursos" component={MisCursos} />
+      <Tab.Screen name="Crear Curso" component={CrearCurso} />
+      <Tab.Screen name="Ver Estudiantes" component={VerEstudiante} />
+    </Tab.Navigator>
+  );
+};
 
-    const [selectedLanguage, setSelectedLanguage] = useState();
+const InicioDoc = () => {
+  const Drawer = createDrawerNavigator();
 
-    return (
-        <>
-            <View style={styles.viewForms}>
-            <Text>Eres un Docente</Text>
+  return (
+    <NavigationContainer>
+        <Drawer.Navigator initialRouteName="Inicio">
+        <Drawer.Screen name="Inicio" component={TabNavigator} />
+        <Drawer.Screen name="Editar Perfil">
+          {() => (
+              <EditarPerfil/>
+          )}
+        </Drawer.Screen>
+        <Drawer.Screen name="Cerrar Sesión">
+          {() => (
+            <View style={styles.container}>
+              <Text>Ayuda</Text>
             </View>
-
-        </>
-    );
+          )}
+        </Drawer.Screen>
+      </Drawer.Navigator>
+    </NavigationContainer>
+  );
 };
 
 const styles = StyleSheet.create({
-    viewForms: {
-        position: 'absolute',
-        bottom: 10,
-        backgroundColor: Colors.PRIMARY_COLOR_OSCURO,
-        width: '85%',
-        borderRadius: 20,
-        padding: 20,
-        paddingTop:50
-    },
-    viewInput: {
-        flexDirection: 'row',
-        marginBottom: 10, // Añadido para separar los inputs
-    },
-    input: {
-        height: 50,
-        width: '60%', // Ajustado para dar más espacio al segundo input
-        backgroundColor: '#fff',
-        borderWidth: 1,
-        borderColor: Colors.PRIMARY_COLOR,
-        borderRadius: 5,
-        paddingLeft: 5,
-        marginRight: 10,
-    },
-    inputPorcentaje: {
-        width: '30%', // Ajustado para dar un tamaño más acorde
-    },
-
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f0f0f0',
+  },
 });
-
-const pickerStyles = StyleSheet.create({
-    input: {
-        backgroundColor: '#fff',
-        borderRadius: 60,
-        borderWidth: 1,
-        paddingVertical: 10
-    }
-
-})
 
 export default InicioDoc;

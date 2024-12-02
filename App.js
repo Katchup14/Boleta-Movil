@@ -14,7 +14,7 @@ export default function App() {
   const [value, setValue] = useState();
   const [user, setUser] = useState(null); // Cambié a null para indicar estado de carga
   const [rol,setRol]=useState('')
-
+  const [usuario,setUsuario]=useState({});
 
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-     {user ? <App2 rol={rol}/> : <Auth setRol={setRol}/>}
+     {user ? <App2 rol={rol} usuario={usuario}/> : <Auth setRol={setRol} setUsuario={setUsuario}/>}
     </View>
   );
 }

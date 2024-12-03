@@ -13,6 +13,7 @@
     "@react-native-picker/picker": "^2.10.1",
     "@react-navigation/bottom-tabs": "^7.1.2",
     "@react-navigation/drawer": "^7.0.17",
+    "boleta-movil": "file:",
     "expo": "~52.0.11",
     "expo-status-bar": "~2.0.0",
     "firebase": "^11.0.2",

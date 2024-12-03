@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from 'react';
-import { StyleSheet, Text, View,ScrollView,TouchableOpacity,Modal,Button  } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal, Button } from 'react-native';
+import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from "./../../../utils/firebase.js";
 
 
@@ -38,22 +38,48 @@ const MisCursos = ({ navigation, usuario }) => {
     setModalVisible(false);
     setCursoSeleccionado(null);
   };
+  const eliminarCurso = async (curso) => {
+    try {
+      const q = query(collection(db, 'curso_Inscrito'), where('id_curso', '==', curso.id));
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        querySnapshot.forEach(async (documentSnapshot) => {
+          const idCurso = documentSnapshot.id;
+          await deleteDoc(doc(db, 'curso_Inscrito', idCurso));
+        });
+
+      } else {
+        console.log('No se encontraron documentos que coincidan con el filtro');
+        const cursoRef = doc(db, 'cursos', curso.id);
+        await deleteDoc(cursoRef);
+        alert('Curso Eliminado');
+        setCursos((prevCursos) => prevCursos.filter((item) => item.id !== curso.id));
+        cerrarModal()
+      }
+    } catch (error) {
+      console.error('Error al obtener documentos: ', error);
+    }
+  }
 
   return (
     <>
-    <View style={styles.container}>
-      <Text style={styles.title}>Mis Cursos</Text>
-      <ScrollView style={styles.scroll}>
-        {cursos.map(curso => (
-          <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
-            <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
-            <Text style={styles.subject}>Materia: {curso.Materia}</Text>
-            <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </View>
-    {cursoSeleccionado && (
+      <View style={styles.container}>
+        <Text style={styles.title}>Mis Cursos</Text>
+        <ScrollView style={styles.scroll}>
+          {cursos.length === 0 ? (
+            <Text style={styles.title}>¡Registra tu curso ahora!</Text>
+          ) : (
+            cursos.map(curso => (
+              <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
+                <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
+                <Text style={styles.subject}>Materia: {curso.Materia}</Text>
+                <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </View>
+      {cursoSeleccionado && (
         <Modal
           animationType="slide"
           transparent={true}
@@ -64,8 +90,11 @@ const MisCursos = ({ navigation, usuario }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Curso</Text>
               <Text>Nombre: {cursoSeleccionado.Nombre}</Text>
-              <Text style={[styles.modalTitle,styles.plus]}>{cursoSeleccionado.Codigo}</Text>
-              <Button title="Cerrar" onPress={cerrarModal} />
+              <Text style={[styles.modalTitle, styles.plus]}>{cursoSeleccionado.Codigo}</Text>
+              <View style={styles.containerBoton}>
+                <Button title="Eliminar" onPress={() => { eliminarCurso(cursoSeleccionado) }}  />
+                <Button title="Cerrar" onPress={cerrarModal} />
+              </View>
             </View>
           </View>
         </Modal>
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#e6e6e6', // Gris ligeramente más oscuro
     borderColor: '#000',        // Borde blanco
-    borderWidth: 1,             // Grosor del borde
+    borderWidth: 1,
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -132,13 +161,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,         // Opacidad de la sombra
     shadowRadius: 5,            // Radio de la sombra
     elevation: 6,               // Para sombras en Android
-  },  
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
   },
-  plus:{
+  plus: {
     fontSize: 40,
-  }
+  },
+  containerBoton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '70%'
+  },
+  botonEliminar:{
+    backgroundColor: 'red',
+    }
 });

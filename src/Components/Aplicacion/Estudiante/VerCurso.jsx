@@ -56,14 +56,18 @@ export default function VerCurso({ navigation, usuario }) {
     <View style={styles.container}>
       <Text style={styles.title}>Cursos Inscritos</Text>
       <ScrollView style={styles.scroll}>
-        {cursosInscritos.map((curso) => (
-          <Curso
-            key={curso.id}
-            curso={curso}
-            usuario={usuario}
-            setCursos={setCursosInscritos}
-          />
-        ))}
+        {cursosInscritos.length > 0 ? (
+          cursosInscritos.map((curso) => (
+            <Curso
+              key={curso.id}
+              curso={curso}
+              usuario={usuario}
+              setCursos={setCursosInscritos}
+            />
+          ))
+        ) : (
+          <Text style={styles.noCoursesText}>No hay cursos disponibles</Text>
+        )}
         {cursosInscritos.length > 0 && (
           <TouchableOpacity
             style={styles.updateButton}
@@ -92,6 +96,11 @@ const styles = StyleSheet.create({
   },
   scroll: {
     marginBottom: 20,
+  },
+  noCoursesText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#fff',
   },
   updateButton: {
     marginVertical: 20,

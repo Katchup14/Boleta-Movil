@@ -3,7 +3,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useState } from "react";
 
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { app,db } from "./../utils/firebase.js";
+import { app, db } from "./../utils/firebase.js";
 import { collection, addDoc } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,19 +11,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { validateEmail } from "../controller";
 
-export default function RegisterForm (
+export default function RegisterForm(
     {
-        changeForm = () => { },setRol,setUsuario
+        changeForm = () => { }, setRol, setUsuario
     }
 ) {
-    const [rolI,setRolI] = useState('')
+    const [rolI, setRolI] = useState('')
     const [sexo, setSexo] = useState('');
     const [data, setData] = useState({ email: '', password: '', confirmPassword: '' })
     const [datosCompletos, setDatosCompletos] = useState({ Nombre: '', Apellido_Paterno: '', Apellido_Materno: '', Contraseña: '', Correo: '', rol: '', sexo: '' })
 
     const [error, setError] = useState({ emailE: '', passwordE: '', confirmPasswordE: '' })
 
-    
+
     const updateData = (newValue, campo) => {
         const newData = { ...data }
         newData[campo] = newValue
@@ -39,27 +39,32 @@ export default function RegisterForm (
     const validateData = (data) => {
         const { email, password, confirmPassword } = data;
         let newError = { emailE: '', passwordE: '', confirmPasswordE: '' };
-
+    
+        // Validación del correo
         if (!email) {
             newError.emailE = 'El email es obligatorio';
         } else if (!validateEmail(email)) {
-            newError.emailE = 'El email no es valido';
+            newError.emailE = 'El email no es válido';
         }
-
+    
+        // Validación de la contraseña
         if (!password) {
             newError.passwordE = 'El password es obligatorio';
         } else if (password.length <= 6) {
             newError.passwordE = 'El password debe ser mayor a 6 caracteres';
         }
-
+    
         if (!confirmPassword) {
             newError.confirmPasswordE = 'Debes confirmar el password';
         } else if (confirmPassword.length <= 6) {
             newError.confirmPasswordE = 'La confirmación debe ser mayor a 6 caracteres';
+        } else if (password !== confirmPassword) {
+            newError.confirmPasswordE = 'Las contraseñas no coinciden';
         }
-
+    
         return newError;
     };
+    
 
     const registerUser = async (email, password, datosCompletos) => {
         const auth = getAuth(app);
@@ -74,35 +79,47 @@ export default function RegisterForm (
                 Apellido_Materno: datosCompletos.Apellido_Materno,
                 rol: datosCompletos.rol,
                 sexo: datosCompletos.sexo,
-                Correo:email,
-                Contraseña:password
+                Correo: email,
+                Contraseña: password
             });
             await AsyncStorage.setItem('rol', datosCompletos.rol);
-            setRol(datosCompletos.rol)
-            setUsuario({"id":docRef.id,
-                        "Nombre":datosCompletos.Nombre,
-                        "ApellidoP":datosCompletos.Apellido_Paterno,
-                        "ApellidoM":datosCompletos.Apellido_Materno})
+            setRol(datosCompletos.rol);
+            setUsuario({
+                "id": docRef.id,
+                "Nombre": datosCompletos.Nombre,
+                "ApellidoP": datosCompletos.Apellido_Paterno,
+                "ApellidoM": datosCompletos.Apellido_Materno
+            });
         } catch (error) {
-            console.error("Error al guardar el empleado:", error);
-            alert("Error al guardar los datos. Intenta nuevamente.");
+            //console.error("Error al guardar el empleado:", error);
+            if (error.code === "auth/email-already-in-use") {
+                alert("Este correo ya está registrado. Por favor, utiliza otro.");
+            } else {
+                alert("Error al guardar los datos. Intenta nuevamente.");
+            }
         }
     };
+    
 
     const check = async () => {
         const { email, password, confirmPassword } = data;
         const newError = validateData(data);
         setError(newError);
 
+        if (!datosCompletos.Nombre || !datosCompletos.Apellido_Paterno || !datosCompletos.Apellido_Materno || !datosCompletos.rol || !datosCompletos.sexo) {
+            alert("Por favor, completa todos los campos.");
+            return;
+        }
+
         if (!newError.emailE && !newError.passwordE && !newError.confirmPasswordE) {
             console.log('---------- No hay errores -----------');
             await registerUser(email, password, datosCompletos);
-        }else{
-            if(newError.emailE) alert(newError.emailE)
-            if(newError.passwordE) alert(newError.confirmPasswordE)
+        } else {
+            if (newError.emailE) alert(newError.emailE);
+            if (newError.passwordE) alert(newError.passwordE);
+            if (newError.confirmPasswordE) alert(newError.confirmPasswordE);
         }
     };
-
     return (
         <View style={styles.container}>
             <TextInput

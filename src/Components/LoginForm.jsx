@@ -44,9 +44,19 @@ export default function LoginForm(
                 setRol(rol)
                 return rol;
             } else {
+                alert("No se Encontraron las Crendenciales")
                 console.log("No se encontró el usuario con el correo proporcionado");
             }
         } catch (error) {
+        if (error.code === 'auth/invalid-email') {
+            alert('El correo electrónico no es válido. Por favor ingresa un correo electrónico válido.');
+        } 
+        if (error.code === 'auth/missing-password') {
+            alert('Favor de colocar la contraseña');
+        } 
+        if (error.code === 'auth/invalid-credential') {
+            alert('Credenciales no Validas');
+        } 
             console.log('Error:', error.message);
         }
     }

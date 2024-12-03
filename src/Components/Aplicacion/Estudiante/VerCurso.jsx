@@ -68,14 +68,12 @@ export default function VerCurso({ navigation, usuario }) {
         ) : (
           <Text style={styles.noCoursesText}>No hay cursos disponibles</Text>
         )}
-        {cursosInscritos.length > 0 && (
-          <TouchableOpacity
-            style={styles.updateButton}
-            onPress={obtenerCursosInscritos}
-          >
-            <Text style={styles.updateButtonText}>Actualizar</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.updateButton}
+          onPress={obtenerCursosInscritos}
+        >
+          <Text style={styles.updateButtonText}>Actualizar</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );

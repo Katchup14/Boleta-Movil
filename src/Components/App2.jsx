@@ -12,9 +12,7 @@ export default function App2({ rol, usuario, signout }) {
       {rol === 'Estudiante' && (
         <InicioEst usuario={usuario} signout={signout} />
       )}
-      {!['Docente', 'Estudiante'].includes(rol) && (
-         <Loading/>
-      )}
+      {!['Docente', 'Estudiante'].includes(rol) && <Loading />}
     </>
   );
 }

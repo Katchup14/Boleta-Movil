@@ -42,13 +42,16 @@ const MisCursos = ({ navigation, usuario }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Mis Boletas</Text>
       <ScrollView style={styles.scroll}>
-        {cursos.map(curso => (
+      {cursos.length === 0 ? (
+            <Text style={styles.title}>¡Registra tu curso ahora!</Text>
+          ) : (
+        cursos.map(curso => (
           <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
             <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
             <Text style={styles.subject}>Materia: {curso.Materia}</Text>
             <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
           </TouchableOpacity>
-        ))}
+        )))}
       </ScrollView>
     </View>}
     </>

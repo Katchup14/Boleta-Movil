@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import Icon from 'react-native-vector-icons/Ionicons'; // Importa los íconos
 import { NavigationContainer } from '@react-navigation/native';
 import EditarPerfil from '../Docente/EditarPerfil';
 import AgregarCurso from './AgregarCurso';
@@ -11,12 +12,27 @@ const TabNavigator = ({ usuario }) => {
   const Tab = createBottomTabNavigator();
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false, // Ocultar el header en las pantallas de las tabs
-      }}
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          // Definir íconos para cada pestaña
+          if (route.name === 'Agregar Curso') {
+            iconName = 'add-circle-outline'; // Ícono para Agregar Curso
+          } else if (route.name === 'Ver Cursos') {
+            iconName = 'eye-outline'; // Ícono para Ver Cursos
+          }
+
+          // Retornar el ícono correspondiente
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#2b6cb0', // Color activo
+        tabBarInactiveTintColor: 'gray', // Color inactivo
+      })}
     >
       <Tab.Screen
-        name='Agrrega Curso'
+        name='Agregar Curso'
         children={() => <AgregarCurso usuario={usuario} />}
       />
       <Tab.Screen
@@ -36,11 +52,23 @@ const InicioEst = ({ usuario, signout }) => {
           name='Inicio'
           children={() => <TabNavigator usuario={usuario} />}
         />
-        <Drawer.Screen name='Editar Perfil'>
+        <Drawer.Screen
+          name='Editar Perfil'
+          options={{
+            drawerIcon: ({ color, size }) => (
+              <Icon name='create-outline' size={size} color={color} /> // Ícono para Editar Perfil
+            ),
+          }}
+        >
           {() => <EditarPerfil usuario={usuario} />}
         </Drawer.Screen>
         <Drawer.Screen
           name='Cerrar Sesión'
+          options={{
+            drawerIcon: ({ color, size }) => (
+              <Icon name='log-out-outline' size={size} color={color} /> // Ícono para Cerrar Sesión
+            ),
+          }}
           children={() => {
             signout();
             return null;

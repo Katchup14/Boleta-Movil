@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  Button,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from './../../../utils/firebase.js';
 
@@ -60,11 +53,20 @@ export default function Curso({ curso, usuario, setCursos }) {
               <Text style={styles.modalTitle}>Detalles del Curso</Text>
               <Text>Nombre: {cursoSeleccionado.Nombre}</Text>
               <Text>Código: {cursoSeleccionado.Codigo}</Text>
-              <Button title='Cerrar' onPress={cerrarModal} />
-              <Button
-                title='Confirmar Baja'
-                onPress={() => darDeBaja(cursoSeleccionado.id)}
-              />
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.closeButton]}
+                  onPress={cerrarModal}
+                >
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.confirmButton]}
+                  onPress={() => darDeBaja(cursoSeleccionado.id)}
+                >
+                  <Text style={styles.buttonText}>Confirmar Baja</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     backgroundColor: '#FF0000',
-    borderRadius: 5,
+    borderRadius: 10,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -137,5 +139,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 10,
+    marginHorizontal: 5,
+  },
+  closeButton: {
+    backgroundColor: '#808080', // Gris
+  },
+  confirmButton: {
+    backgroundColor: '#FF0000', // Rojo
   },
 });

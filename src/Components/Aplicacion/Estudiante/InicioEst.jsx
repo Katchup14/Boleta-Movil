@@ -13,22 +13,20 @@ const TabNavigator = ({ usuario }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // Ocultar el header en las pantallas de las tabs
+        headerShown: false, 
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          // Definir íconos para cada pestaña
           if (route.name === 'Agregar Curso') {
-            iconName = 'add-circle-outline'; // Ícono para Agregar Curso
+            iconName = 'add-circle-outline'; 
           } else if (route.name === 'Ver Cursos') {
-            iconName = 'eye-outline'; // Ícono para Ver Cursos
+            iconName = 'eye-outline'; 
           }
 
-          // Retornar el ícono correspondiente
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2b6cb0', // Color activo
-        tabBarInactiveTintColor: 'gray', // Color inactivo
+        tabBarActiveTintColor: '#2b6cb0', 
+        tabBarInactiveTintColor: 'gray', 
       })}
     >
       <Tab.Screen
@@ -56,7 +54,7 @@ const InicioEst = ({ usuario, signout }) => {
           name='Editar Perfil'
           options={{
             drawerIcon: ({ color, size }) => (
-              <Icon name='create-outline' size={size} color={color} /> // Ícono para Editar Perfil
+              <Icon name='create-outline' size={size} color={color} /> 
             ),
           }}
         >
@@ -66,7 +64,7 @@ const InicioEst = ({ usuario, signout }) => {
           name='Cerrar Sesión'
           options={{
             drawerIcon: ({ color, size }) => (
-              <Icon name='log-out-outline' size={size} color={color} /> // Ícono para Cerrar Sesión
+              <Icon name='log-out-outline' size={size} color={color} /> 
             ),
           }}
           children={() => {

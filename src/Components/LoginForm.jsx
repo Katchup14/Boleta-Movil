@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button, Text, StyleSheet, TextInput, View } from "react-native";
 
 import {app,db} from '../utils/firebase.js'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 
@@ -40,7 +39,6 @@ export default function LoginForm(
                             "ApellidoM":userDoc.data().Apellido_Materno,
                             "id":userDoc.id
                         })
-                await AsyncStorage.setItem('rol', rol);
                 setRol(rol)
                 return rol;
             } else {

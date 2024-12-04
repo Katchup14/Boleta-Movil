@@ -5,7 +5,6 @@ import { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { app, db } from "./../utils/firebase.js";
 import { collection, addDoc } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -82,7 +81,6 @@ export default function RegisterForm(
                 Correo: email,
                 Contraseña: password
             });
-            await AsyncStorage.setItem('rol', datosCompletos.rol);
             setRol(datosCompletos.rol);
             setUsuario({
                 "id": docRef.id,

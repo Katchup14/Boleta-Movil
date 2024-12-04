@@ -19,20 +19,17 @@ const TabNavigator = ({ usuario }) => {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          // Definir íconos para cada pestaña
           if (route.name === 'Mis Cursos') {
-            iconName = 'book-outline'; // Ícono para Mis Cursos
+            iconName = 'book-outline'; 
           } else if (route.name === 'Crear Curso') {
-            iconName = 'add-circle-outline'; // Ícono para Crear Curso
+            iconName = 'add-circle-outline'; 
           } else if (route.name === 'Ver Estudiantes') {
-            iconName = 'people-outline'; // Ícono para Ver Estudiantes
+            iconName = 'people-outline'; 
           }
-
-          // Retornar el ícono correspondiente
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2b6cb0', // Color activo
-        tabBarInactiveTintColor: 'gray',  // Color inactivo
+        tabBarActiveTintColor: '#2b6cb0', 
+        tabBarInactiveTintColor: 'gray',  
       })}
     >
       <Tab.Screen

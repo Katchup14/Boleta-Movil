@@ -1,21 +1,39 @@
-import { React, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal, Button } from 'react-native';
-import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from "./../../../utils/firebase.js";
-
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  Button,
+} from 'react-native';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
+import { db } from './../../../utils/firebase.js';
+import Svg from 'react-native-svg'; // Importar Svg
+import QRCode from 'react-native-qrcode-svg'; // Importar QRCode
 
 const MisCursos = ({ navigation, usuario }) => {
-  const [cursos, setCursos] = useState([])
+  const [cursos, setCursos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
-
 
   useEffect(() => {
     const obtenerEmpleados = async () => {
       try {
-        const q = query(collection(db, 'cursos'), where('id_profesor', '==', usuario.id));
+        const q = query(
+          collection(db, 'cursos'),
+          where('id_profesor', '==', usuario.id)
+        );
         const querySnapshot = await getDocs(q);
-        const cursosData = querySnapshot.docs.map(doc => ({
+        const cursosData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -26,8 +44,7 @@ const MisCursos = ({ navigation, usuario }) => {
     };
 
     obtenerEmpleados();
-
-  }, [cursos])
+  }, [cursos]);
 
   const abrirModal = (curso) => {
     setCursoSeleccionado(curso);
@@ -38,28 +55,33 @@ const MisCursos = ({ navigation, usuario }) => {
     setModalVisible(false);
     setCursoSeleccionado(null);
   };
+
   const eliminarCurso = async (curso) => {
     try {
-      const q = query(collection(db, 'curso_Inscrito'), where('id_curso', '==', curso.id));
+      const q = query(
+        collection(db, 'curso_Inscrito'),
+        where('id_curso', '==', curso.id)
+      );
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         querySnapshot.forEach(async (documentSnapshot) => {
           const idCurso = documentSnapshot.id;
           await deleteDoc(doc(db, 'curso_Inscrito', idCurso));
         });
-
       } else {
         console.log('No se encontraron documentos que coincidan con el filtro');
         const cursoRef = doc(db, 'cursos', curso.id);
         await deleteDoc(cursoRef);
         alert('Curso Eliminado');
-        setCursos((prevCursos) => prevCursos.filter((item) => item.id !== curso.id));
-        cerrarModal()
+        setCursos((prevCursos) =>
+          prevCursos.filter((item) => item.id !== curso.id)
+        );
+        cerrarModal();
       }
     } catch (error) {
       console.error('Error al obtener documentos: ', error);
     }
-  }
+  };
 
   return (
     <>
@@ -69,8 +91,12 @@ const MisCursos = ({ navigation, usuario }) => {
           {cursos.length === 0 ? (
             <Text style={styles.title}>¡Registra tu curso ahora!</Text>
           ) : (
-            cursos.map(curso => (
-              <TouchableOpacity key={curso.id} style={styles.card} onPress={() => abrirModal(curso)}>
+            cursos.map((curso) => (
+              <TouchableOpacity
+                key={curso.id}
+                style={styles.card}
+                onPress={() => abrirModal(curso)}
+              >
                 <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
                 <Text style={styles.subject}>Materia: {curso.Materia}</Text>
                 <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
@@ -81,7 +107,7 @@ const MisCursos = ({ navigation, usuario }) => {
       </View>
       {cursoSeleccionado && (
         <Modal
-          animationType="slide"
+          animationType='slide'
           transparent={true}
           visible={modalVisible}
           onRequestClose={cerrarModal}
@@ -90,10 +116,23 @@ const MisCursos = ({ navigation, usuario }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Curso</Text>
               <Text>Nombre: {cursoSeleccionado.Nombre}</Text>
-              <Text style={[styles.modalTitle, styles.plus]}>{cursoSeleccionado.Codigo}</Text>
+              <Text style={[styles.modalTitle, styles.plus]}>
+                {cursoSeleccionado.Codigo}
+              </Text>
+              <QRCode
+                value={cursoSeleccionado.Codigo}
+                size={150}
+                color='black'
+                backgroundColor='white'
+              />
               <View style={styles.containerBoton}>
-                <Button title="Eliminar" onPress={() => { eliminarCurso(cursoSeleccionado) }}  />
-                <Button title="Cerrar" onPress={cerrarModal} />
+                <Button
+                  title='Eliminar'
+                  onPress={() => {
+                    eliminarCurso(cursoSeleccionado);
+                  }}
+                />
+                <Button title='Cerrar' onPress={cerrarModal} />
               </View>
             </View>
           </View>
@@ -101,7 +140,7 @@ const MisCursos = ({ navigation, usuario }) => {
       )}
     </>
   );
-}
+};
 
 export default MisCursos;
 
@@ -150,17 +189,17 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#e6e6e6', // Gris ligeramente más oscuro
-    borderColor: '#000',        // Borde blanco
+    borderColor: '#000', // Borde blanco
     borderWidth: 1,
     padding: 20,
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    shadowColor: '#000',        // Sombra negra
+    shadowColor: '#000', // Sombra negra
     shadowOffset: { width: 0, height: 4 }, // Desplazamiento de la sombra
-    shadowOpacity: 0.3,         // Opacidad de la sombra
-    shadowRadius: 5,            // Radio de la sombra
-    elevation: 6,               // Para sombras en Android
+    shadowOpacity: 0.3, // Opacidad de la sombra
+    shadowRadius: 5, // Radio de la sombra
+    elevation: 6, // Para sombras en Android
   },
   modalTitle: {
     fontSize: 20,
@@ -171,11 +210,12 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   containerBoton: {
+    marginTop: '5%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '70%'
+    width: '70%',
   },
-  botonEliminar:{
+  botonEliminar: {
     backgroundColor: 'red',
-    }
+  },
 });

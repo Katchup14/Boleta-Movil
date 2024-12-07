@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,18 +6,29 @@ import {
   TextInput,
   Alert,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from './../../../utils/firebase.js';
 
+import { CameraView, useCameraPermissions } from 'expo-camera';
+
 export default function AgregarCurso({ navigation, usuario }) {
   const [codigoCurso, setCodigoCurso] = useState('');
   const [cursoData, setCursoData] = useState(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
 
-  const buscarCurso = async () => {
+  useEffect(() => {
+    if (permission && !permission.granted) {
+      requestPermission();
+    }
+  }, [permission]);
+
+  const buscarCurso = async (codigo) => {
     try {
       const cursosCollection = collection(db, 'cursos');
-      const q = query(cursosCollection, where('Codigo', '==', codigoCurso));
+      const q = query(cursosCollection, where('Codigo', '==', codigo));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -33,6 +44,13 @@ export default function AgregarCurso({ navigation, usuario }) {
     }
   };
 
+  const handleBarCodeScanned = (data) => {
+    setIsCameraOpen(false);
+    console.log('Soy el código', data);
+    setCodigoCurso(data);
+    buscarCurso(data);
+  };
+
   const unirmeACurso = async () => {
     console.log('Usuario:', usuario);
     console.log('Curso Data:', cursoData);
@@ -43,7 +61,6 @@ export default function AgregarCurso({ navigation, usuario }) {
     }
 
     try {
-      // Verificar inscripción
       const cursoInscritoCollection = collection(db, 'curso_Inscrito');
       const q = query(
         cursoInscritoCollection,
@@ -62,7 +79,6 @@ export default function AgregarCurso({ navigation, usuario }) {
         return;
       }
 
-      // Unirse al curso
       await addDoc(cursoInscritoCollection, {
         Calificaciones: ['-1', '-1', '-1', '-1', '-1'],
         id_Estudiante: usuario.id,
@@ -79,6 +95,25 @@ export default function AgregarCurso({ navigation, usuario }) {
     }
   };
 
+  if (!permission) {
+    console.log('Con permisos');
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    console.log('Sin permisos');
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>
+          Necesitamos tu permiso para acceder a la cámara
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
+          <Text style={styles.buttonText}>Conceder permiso</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Agregar Curso</Text>
@@ -89,9 +124,41 @@ export default function AgregarCurso({ navigation, usuario }) {
         value={codigoCurso}
         onChangeText={setCodigoCurso}
       />
-      <TouchableOpacity style={styles.button} onPress={buscarCurso}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => buscarCurso(codigoCurso)}
+      >
         <Text style={styles.buttonText}>Buscar Curso</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => setIsCameraOpen(true)}
+      >
+        <Text style={styles.buttonText}>Escanear Curso</Text>
+      </TouchableOpacity>
+      {isCameraOpen && (
+        <SafeAreaView style={StyleSheet.absoluteFillObject}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing='back'
+            barcodeScannerSettings={{
+              barcodeTypes: ['qr'],
+            }}
+            onBarcodeScanned={({ data }) => {
+              handleBarCodeScanned(data);
+            }}
+          >
+            <View style={styles.cameraOverlay}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setIsCameraOpen(false)}
+              >
+                <Text style={styles.buttonText}>Cerrar Cámara</Text>
+              </TouchableOpacity>
+            </View>
+          </CameraView>
+        </SafeAreaView>
+      )}
       {cursoData && (
         <View style={styles.cursoInfo}>
           <Text style={styles.cursoText}>Materia: {cursoData.Materia}</Text>
@@ -150,5 +217,32 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     marginVertical: 5,
+  },
+  cameraContainer: {
+    flex: 1,
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  cameraOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  closeButton: {
+    backgroundColor: '#ff4444',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginBottom: 30,
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+    color: 'white',
   },
 });

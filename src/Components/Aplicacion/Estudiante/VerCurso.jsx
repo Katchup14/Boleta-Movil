@@ -1,36 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import {
   collection,
   query,
   where,
-  getDocs,
+  onSnapshot,
   doc,
   getDoc,
 } from 'firebase/firestore';
 import { db } from './../../../utils/firebase.js';
 import Curso from './Curso.jsx';
+import { useFocusEffect } from '@react-navigation/native';
+import { Image } from 'react-native';
 
 export default function VerCurso({ navigation, usuario }) {
   const [cursosInscritos, setCursosInscritos] = useState([]);
 
-  const obtenerCursosInscritos = async () => {
-    console.log('soy usuario', usuario);
+  const obtenerCursosInscritos = () => {
+    console.log('Configurando listener de cursos inscritos');
 
-    try {
-      const q = query(
-        collection(db, 'curso_Inscrito'),
-        where('id_Estudiante', '==', usuario.id)
-      );
+    const q = query(
+      collection(db, 'curso_Inscrito'),
+      where('id_Estudiante', '==', usuario.id)
+    );
 
-      const querySnapshot = await getDocs(q);
-
+    //Función de Firestore que permite escuchar cambios en tiempo real en una colección o documento específico
+    const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       const cursosData = await Promise.all(
         querySnapshot.docs.map(async (inscripcionDoc) => {
           const cursoRef = doc(db, 'cursos', inscripcionDoc.data().id_curso);
@@ -42,15 +37,30 @@ export default function VerCurso({ navigation, usuario }) {
           };
         })
       );
+      console.log('Hubó cambios');
+
       setCursosInscritos(cursosData);
-    } catch (error) {
-      console.error('Error al obtener los cursos inscritos: ', error);
-    }
+    });
+
+    return unsubscribe;
   };
 
-  useEffect(() => {
-    obtenerCursosInscritos();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Estoy focus en Ver Curso');
+
+      // Se resetean los estados como al principio
+      setCursosInscritos([]);
+
+      const unsubscribe = obtenerCursosInscritos();
+
+      // Limpiar el listener cuando el componente pierde el focus para evitar escuchas inecesarios
+      return () => {
+        console.log('Perdimos el focus en Ver Curso');
+        unsubscribe();
+      };
+    }, [usuario])
+  );
 
   return (
     <View style={styles.container}>
@@ -66,14 +76,14 @@ export default function VerCurso({ navigation, usuario }) {
             />
           ))
         ) : (
-          <Text style={styles.noCoursesText}>No hay cursos disponibles</Text>
+          <>
+            <Image
+              style={styles.logo}
+              source={require('../../../../assets/No_Cursos.png')}
+            />
+            <Text style={styles.noCoursesText}>0 Cursos Disponibles</Text>
+          </>
         )}
-        <TouchableOpacity
-          style={styles.updateButton}
-          onPress={obtenerCursosInscritos}
-        >
-          <Text style={styles.updateButtonText}>Actualizar</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -86,7 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#001F54',
   },
   title: {
-    fontSize: 24,
+    fontSize: 38,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
@@ -96,22 +106,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   noCoursesText: {
-    fontSize: 18,
-    textAlign: 'center',
-    color: '#fff',
-  },
-  updateButton: {
-    marginVertical: 20,
-    padding: 10,
-    backgroundColor: '#4CAF50', // Verde
-    borderColor: '#4CAF50', // Borde verde
-    borderWidth: 1,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  updateButtonText: {
-    color: '#FFFFFF',
+    fontSize: 26,
     textAlign: 'center',
     fontWeight: 'bold',
+    color: '#fff',
+  },
+  logo: {
+    width: 300,
+    height: 300,
+    marginVertical: 30,
+    alignSelf: 'center',
+    borderRadius: 15,
   },
 });

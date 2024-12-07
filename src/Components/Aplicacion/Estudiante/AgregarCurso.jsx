@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -27,8 +27,8 @@ export default function AgregarCurso({ navigation, usuario }) {
   }, [permission]);
 
   useFocusEffect(
-    React.useCallback(() => {
-      console.log('Estoy focus');
+    useCallback(() => {
+      console.log('Estoy focus en Agregar Curso');
 
       // Se resetean los estados como al principio
       setCodigoCurso('');
@@ -37,7 +37,7 @@ export default function AgregarCurso({ navigation, usuario }) {
 
       // Retornar una función de limpieza si es necesario
       return () => {
-        console.log('Perdimos el focus');
+        console.log('Perdimos el focus en Agregar Curso');
       };
     }, [])
   );
@@ -84,7 +84,7 @@ export default function AgregarCurso({ navigation, usuario }) {
         where('id_curso', '==', cursoData.uid),
         where('id_Estudiante', '==', usuario.id)
       );
-      console.log('Consulta de inscripción:', q);
+      //console.log('Consulta de inscripción:', q);
 
       const querySnapshot = await getDocs(q);
       console.log('Resultados de la consulta:', querySnapshot.empty);

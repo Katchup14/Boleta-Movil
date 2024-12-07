@@ -32,11 +32,15 @@ export default function Curso({ curso, usuario, setCursos }) {
   return (
     <View style={styles.card}>
       <Text style={styles.courseName}>Curso: {curso.Nombre}</Text>
-      <Text style={styles.subject}>Materia: {curso.Materia}</Text>
-      <Text style={styles.status}>Estatus: {curso.Estatus}</Text>
-      <Text style={styles.grade}>
-        Calificaciones:{' '}
-        {curso.Calificaciones ? curso.Calificaciones.join(', ') : 'N/A'}
+      <Text style={styles.courseText}>
+        <Text style={{ fontWeight: 'bold' }}>Materia:</Text> {curso.Materia}
+      </Text>
+      <Text style={styles.courseText}>
+        <Text style={{ fontWeight: 'bold' }}>Estatus:</Text> {curso.Estatus}
+      </Text>
+      <Text style={styles.courseText}>
+        <Text style={{ fontWeight: 'bold' }}>Calificaciones: </Text>[
+        {curso.Calificaciones ? curso.Calificaciones.join(', ') : 'N/A'}]
       </Text>
       <TouchableOpacity style={styles.button} onPress={() => abrirModal(curso)}>
         <Text style={styles.buttonText}>Dar de Baja</Text>
@@ -51,8 +55,14 @@ export default function Curso({ curso, usuario, setCursos }) {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Curso</Text>
-              <Text>Nombre: {cursoSeleccionado.Nombre}</Text>
-              <Text>Código: {cursoSeleccionado.Codigo}</Text>
+              <Text style={styles.modalText}>
+                <Text style={{ fontWeight: 'bold' }}>Nombre: </Text>
+                {cursoSeleccionado.Nombre}
+              </Text>
+              <Text style={styles.modalText}>
+                <Text style={{ fontWeight: 'bold' }}>Código: </Text>
+                {cursoSeleccionado.Codigo}
+              </Text>
               <View style={styles.modalButtonContainer}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.closeButton]}
@@ -92,18 +102,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
-  subject: {
+  courseText: {
     fontSize: 16,
-    color: '#555',
     marginBottom: 5,
-  },
-  status: {
-    fontSize: 16,
-    color: '#888',
-  },
-  grade: {
-    fontSize: 16,
-    color: '#333',
   },
   button: {
     marginTop: 10,
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: '80%',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -139,6 +140,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    alignSelf: 'center',
+  },
+  modalText: {
+    paddingHorizontal: 15,
+    paddingBottom: 5,
   },
   modalButtonContainer: {
     flexDirection: 'row',

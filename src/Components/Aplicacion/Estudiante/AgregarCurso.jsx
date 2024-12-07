@@ -7,10 +7,11 @@ import {
   Alert,
   TouchableOpacity,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from './../../../utils/firebase.js';
-
+import { useFocusEffect } from '@react-navigation/native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function AgregarCurso({ navigation, usuario }) {
@@ -24,6 +25,22 @@ export default function AgregarCurso({ navigation, usuario }) {
       requestPermission();
     }
   }, [permission]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('Estoy focus');
+
+      // Se resetean los estados como al principio
+      setCodigoCurso('');
+      setCursoData(null);
+      setIsCameraOpen(false);
+
+      // Retornar una función de limpieza si es necesario
+      return () => {
+        console.log('Perdimos el focus');
+      };
+    }, [])
+  );
 
   const buscarCurso = async (codigo) => {
     try {
@@ -117,6 +134,12 @@ export default function AgregarCurso({ navigation, usuario }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Agregar Curso</Text>
+      {!cursoData && (
+        <Image
+          style={styles.logo}
+          source={require('../../../../assets/Agregar_Curso.png')}
+        />
+      )}
       <TextInput
         style={styles.input}
         placeholder='Ingresa el código del Curso'
@@ -124,18 +147,44 @@ export default function AgregarCurso({ navigation, usuario }) {
         value={codigoCurso}
         onChangeText={setCodigoCurso}
       />
+      {cursoData && (
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Detalles del Curso</Text>
+            <Text style={styles.cursoText}>
+              <Text style={{ fontWeight: 'bold' }}>Materia:</Text>{' '}
+              {cursoData.Materia}
+            </Text>
+            <Text style={styles.cursoText}>
+              <Text style={{ fontWeight: 'bold' }}>Nombre:</Text>{' '}
+              {cursoData.Nombre}
+            </Text>
+            <Text style={styles.cursoText}>
+              <Text style={{ fontWeight: 'bold' }}>Año:</Text> {cursoData.año}
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.modalButton, styles.greenButton]}
+              onPress={unirmeACurso}
+            >
+              <Text style={styles.buttonText}>Unirme al Curso</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, styles.wideButton]}
         onPress={() => buscarCurso(codigoCurso)}
       >
         <Text style={styles.buttonText}>Buscar Curso</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, styles.wideButton, styles.buttonSpacing]}
         onPress={() => setIsCameraOpen(true)}
       >
         <Text style={styles.buttonText}>Escanear Curso</Text>
       </TouchableOpacity>
+
       {isCameraOpen && (
         <SafeAreaView style={StyleSheet.absoluteFillObject}>
           <CameraView
@@ -159,16 +208,6 @@ export default function AgregarCurso({ navigation, usuario }) {
           </CameraView>
         </SafeAreaView>
       )}
-      {cursoData && (
-        <View style={styles.cursoInfo}>
-          <Text style={styles.cursoText}>Materia: {cursoData.Materia}</Text>
-          <Text style={styles.cursoText}>Nombre: {cursoData.Nombre}</Text>
-          <Text style={styles.cursoText}>Año: {cursoData.año}</Text>
-          <TouchableOpacity style={styles.button} onPress={unirmeACurso}>
-            <Text style={styles.buttonText}>Unirme al Curso</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
@@ -177,45 +216,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     backgroundColor: '#001F54',
     padding: 20,
   },
   title: {
+    marginVertical: 20,
     color: 'white',
     fontSize: 35,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   input: {
-    height: 40,
+    height: 50,
     width: '80%',
     backgroundColor: '#fff',
     color: '#000',
     borderRadius: 20,
     paddingHorizontal: 10,
     borderWidth: 1.5,
-    marginVertical: 10,
+    marginVertical: 30,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   button: {
     backgroundColor: '#0066cc',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 25,
-    marginTop: 10,
+    marginTop: 5,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
+    fontWeight: 'bold',
   },
-  cursoInfo: {
-    marginTop: 20,
-    alignItems: 'center',
+  wideButton: {
+    width: '80%',
+  },
+  buttonSpacing: {
+    marginTop: 30,
   },
   cursoText: {
-    color: 'white',
-    fontSize: 18,
+    fontSize: 16,
+    color: '#333',
     marginVertical: 5,
   },
   cameraContainer: {
@@ -244,5 +289,47 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 10,
     color: 'white',
+  },
+  modalContainer: {
+    marginTop: 10,
+    marginBottom: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#e6e6e6',
+    borderColor: '#000',
+    borderWidth: 2,
+    padding: 25,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    marginTop: 15,
+    alignSelf: 'center',
+  },
+  greenButton: {
+    backgroundColor: '#00cc44', // Verde
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    marginVertical: 30,
   },
 });

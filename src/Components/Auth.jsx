@@ -1,58 +1,74 @@
-import { useState } from "react";
-import { Text, View, Image, StyleSheet, Button } from "react-native";
+import { useState } from 'react';
+import {
+  View,
+  Image,
+  StyleSheet,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
+import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
 
-import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
+export default function Auth({ setRol, setUsuario }) {
+  const [isLogin, setIsLogin] = useState(true);
 
-export default function Auth({setRol,setUsuario}) {
+  const changeForm = () => {
+    setIsLogin(!isLogin);
+  };
 
-    const [isLogin, setIsLogin] = useState(true)
-    const [appl, setAPPl] = useState(true)
-
-    const changeForm = () => {
-        setIsLogin(!isLogin)
-    }
-
-    
-
-    return (
-        <>
-            <View style={styles.view}>
-                <Image style={styles.logo} source={require('../../assets/Logo.png')} />
-                {
-                    isLogin ? <LoginForm changeForm={changeForm} setRol={setRol} setUsuario={setUsuario}/> : <RegisterForm changeForm={changeForm} setRol={setRol} setUsuario={setUsuario}/>
-                }
-            </View>
-        </>
-
-    )
+  return (
+    <KeyboardAvoidingView
+      behavior='padding'
+      style={styles.keyboardAvoidingView}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        keyboardShouldPersistTaps='always'
+      >
+        <View style={styles.view}>
+          <Image
+            style={styles.logo}
+            source={require('../../assets/Logo.png')}
+          />
+          {isLogin ? (
+            <LoginForm
+              changeForm={changeForm}
+              setRol={setRol}
+              setUsuario={setUsuario}
+            />
+          ) : (
+            <RegisterForm
+              changeForm={changeForm}
+              setRol={setRol}
+              setUsuario={setUsuario}
+            />
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
 
-
 const styles = StyleSheet.create({
-    view: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',  // Centra los elementos verticalmente
-        backgroundColor: '#000',
-        position: 'relative',
-    },
-    logo: {
-        width: 200,
-        height: 150,
-        marginTop: 1,
-        marginBottom: 1,
-    },
-    cambio: {
-        position: 'absolute',
-        width:'50%',
-        marginTop:60,
-        right:10
-    },
-    btnText: {
-        top: 10,
-        right: 10,
-    }
-})
-
-
+  keyboardAvoidingView: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    backgroundColor: '#000',
+  },
+  view: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#000',
+    padding: 20,
+  },
+  logo: {
+    width: 200,
+    height: 150,
+    marginTop: 15,
+    marginBottom: 1,
+  },
+});

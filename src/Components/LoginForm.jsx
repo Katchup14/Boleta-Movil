@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderWidth: 1.5,
-    fontSize: 18,
+    fontSize: 16,
     marginVertical: 8,
   },
   inputField: {
     flex: 1,
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
   },
   inputContainer: {
     width: '90%',
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

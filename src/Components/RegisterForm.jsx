@@ -278,7 +278,6 @@ export default function RegisterForm({
 const styles = StyleSheet.create({
   container: {
     width: '90%',
-    maxHeight: '80%', // Limita la altura al 80% de la pantalla
     alignItems: 'flex-start',
   },
   input: {
@@ -287,9 +286,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     borderRadius: 20,
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 12,
     borderWidth: 1.5,
-    fontSize: 18,
+    fontSize: 16,
     marginVertical: 8,
   },
   selectContainer: {
@@ -304,15 +303,15 @@ const styles = StyleSheet.create({
     width: '48%',
     paddingHorizontal: 5,
     borderWidth: 1.5,
-    borderColor: '#1e3040',
   },
   picker: {
     color: '#fff',
+    fontSize: 16,
   },
   inputField: {
     flex: 1,
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -322,11 +321,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 1.5,
     marginVertical: 10,
-    paddingVertical: 5,
+    paddingVertical: 3,
   },
   button: {
     backgroundColor: '#00509e',
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 40,
     borderRadius: 20,
     alignItems: 'center',
@@ -336,7 +335,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

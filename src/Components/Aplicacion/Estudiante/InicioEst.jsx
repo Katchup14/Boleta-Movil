@@ -1,5 +1,4 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons'; // Importa los íconos
@@ -13,20 +12,20 @@ const TabNavigator = ({ usuario }) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, 
+        headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
           if (route.name === 'Agregar Curso') {
-            iconName = 'add-circle-outline'; 
+            iconName = 'add-circle-outline';
           } else if (route.name === 'Ver Cursos') {
-            iconName = 'eye-outline'; 
+            iconName = 'eye-outline';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2b6cb0', 
-        tabBarInactiveTintColor: 'gray', 
+        tabBarActiveTintColor: '#2b6cb0',
+        tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tab.Screen
@@ -54,7 +53,7 @@ const InicioEst = ({ usuario, signout }) => {
           name='Editar Perfil'
           options={{
             drawerIcon: ({ color, size }) => (
-              <Icon name='create-outline' size={size} color={color} /> 
+              <Icon name='create-outline' size={size} color={color} />
             ),
           }}
         >
@@ -64,7 +63,7 @@ const InicioEst = ({ usuario, signout }) => {
           name='Cerrar Sesión'
           options={{
             drawerIcon: ({ color, size }) => (
-              <Icon name='log-out-outline' size={size} color={color} /> 
+              <Icon name='log-out-outline' size={size} color={color} />
             ),
           }}
           children={() => {
@@ -76,15 +75,5 @@ const InicioEst = ({ usuario, signout }) => {
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f0f0f0',
-  },
-});
 
 export default InicioEst;

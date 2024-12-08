@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from './../../../utils/firebase.js';
@@ -132,93 +134,113 @@ export default function AgregarCurso({ navigation, usuario }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Agregar Curso</Text>
-      {!cursoData && (
-        <Image
-          style={styles.logo}
-          source={require('../../../../assets/Agregar_Curso.png')}
-        />
-      )}
-      <TextInput
-        style={styles.input}
-        placeholder='Ingresa el código del Curso'
-        placeholderTextColor='#000'
-        value={codigoCurso}
-        onChangeText={setCodigoCurso}
-      />
-      {cursoData && (
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Detalles del Curso</Text>
-            <Text style={styles.cursoText}>
-              <Text style={{ fontWeight: 'bold' }}>Materia:</Text>{' '}
-              {cursoData.Materia}
-            </Text>
-            <Text style={styles.cursoText}>
-              <Text style={{ fontWeight: 'bold' }}>Nombre:</Text>{' '}
-              {cursoData.Nombre}
-            </Text>
-            <Text style={styles.cursoText}>
-              <Text style={{ fontWeight: 'bold' }}>Año:</Text> {cursoData.año}
-            </Text>
-
-            <TouchableOpacity
-              style={[styles.modalButton, styles.greenButton]}
-              onPress={unirmeACurso}
-            >
-              <Text style={styles.buttonText}>Unirme al Curso</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-      <TouchableOpacity
-        style={[styles.button, styles.wideButton]}
-        onPress={() => buscarCurso(codigoCurso)}
+    <KeyboardAvoidingView
+      behavior='padding'
+      style={styles.keyboardAvoidingView}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        keyboardShouldPersistTaps='always'
       >
-        <Text style={styles.buttonText}>Buscar Curso</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, styles.wideButton, styles.buttonSpacing]}
-        onPress={() => setIsCameraOpen(true)}
-      >
-        <Text style={styles.buttonText}>Escanear Curso</Text>
-      </TouchableOpacity>
+        <View style={styles.container}>
+          <Text style={styles.title}>Agregar Curso</Text>
+          {!cursoData && (
+            <Image
+              style={styles.logo}
+              source={require('../../../../assets/Agregar_Curso.png')}
+            />
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder='Ingresa el código del Curso'
+            placeholderTextColor='#000'
+            value={codigoCurso}
+            onChangeText={setCodigoCurso}
+          />
+          {cursoData && (
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Detalles del Curso</Text>
+                <Text style={styles.cursoText}>
+                  <Text style={{ fontWeight: 'bold' }}>Materia:</Text>{' '}
+                  {cursoData.Materia}
+                </Text>
+                <Text style={styles.cursoText}>
+                  <Text style={{ fontWeight: 'bold' }}>Nombre:</Text>{' '}
+                  {cursoData.Nombre}
+                </Text>
+                <Text style={styles.cursoText}>
+                  <Text style={{ fontWeight: 'bold' }}>Año:</Text>{' '}
+                  {cursoData.año}
+                </Text>
 
-      {isCameraOpen && (
-        <SafeAreaView style={StyleSheet.absoluteFillObject}>
-          <CameraView
-            style={StyleSheet.absoluteFillObject}
-            facing='back'
-            barcodeScannerSettings={{
-              barcodeTypes: ['qr'],
-            }}
-            onBarcodeScanned={({ data }) => {
-              handleBarCodeScanned(data);
-            }}
-          >
-            <View style={styles.cameraOverlay}>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setIsCameraOpen(false)}
-              >
-                <Text style={styles.buttonText}>Cerrar Cámara</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.greenButton]}
+                  onPress={unirmeACurso}
+                >
+                  <Text style={styles.buttonText}>Unirme al Curso</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </CameraView>
-        </SafeAreaView>
-      )}
-    </View>
+          )}
+          <TouchableOpacity
+            style={[styles.button, styles.wideButton]}
+            onPress={() => buscarCurso(codigoCurso)}
+          >
+            <Text style={styles.buttonText}>Buscar Curso</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.wideButton, styles.buttonSpacing]}
+            onPress={() => setIsCameraOpen(true)}
+          >
+            <Text style={styles.buttonText}>Escanear Curso</Text>
+          </TouchableOpacity>
+
+          {isCameraOpen && (
+            <SafeAreaView style={StyleSheet.absoluteFillObject}>
+              <CameraView
+                style={StyleSheet.absoluteFillObject}
+                facing='back'
+                barcodeScannerSettings={{
+                  barcodeTypes: ['qr'],
+                }}
+                onBarcodeScanned={({ data }) => {
+                  handleBarCodeScanned(data);
+                }}
+              >
+                <View style={styles.cameraOverlay}>
+                  <TouchableOpacity
+                    style={styles.closeButton}
+                    onPress={() => setIsCameraOpen(false)}
+                  >
+                    <Text style={styles.buttonText}>Cerrar Cámara</Text>
+                  </TouchableOpacity>
+                </View>
+              </CameraView>
+            </SafeAreaView>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+    backgroundColor: '#001F54',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    backgroundColor: '#001F54',
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#001F54',
     padding: 20,
+    position: 'relative',
   },
   title: {
     marginVertical: 20,
@@ -228,16 +250,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    height: 50,
     width: '80%',
     backgroundColor: '#fff',
     color: '#000',
     borderRadius: 20,
     paddingHorizontal: 10,
+    paddingVertical: 15,
     borderWidth: 1.5,
     marginVertical: 30,
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   button: {
     backgroundColor: '#0066cc',

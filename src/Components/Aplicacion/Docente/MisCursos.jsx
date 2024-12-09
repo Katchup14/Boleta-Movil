@@ -24,6 +24,8 @@ const MisCursos = ({ navigation, usuario }) => {
   const [cursos, setCursos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
+  const [modalBaja, setModalBaja] = useState(false);
+
 
   useEffect(() => {
     const obtenerEmpleados = async () => {
@@ -55,7 +57,15 @@ const MisCursos = ({ navigation, usuario }) => {
     setModalVisible(false);
     setCursoSeleccionado(null);
   };
-
+  const abrirModal2 = () =>{
+    setModalBaja(true)
+  }
+  const cerrarModal2 = () =>{
+    setModalBaja(true)
+    setModalVisible(false);
+    setModalBaja(false)
+    setCursoSeleccionado(null);
+  }
   const eliminarCurso = async (curso) => {
     try {
       const q = query(
@@ -76,7 +86,7 @@ const MisCursos = ({ navigation, usuario }) => {
         setCursos((prevCursos) =>
           prevCursos.filter((item) => item.id !== curso.id)
         );
-        cerrarModal();
+        cerrarModal2();
       }
     } catch (error) {
       console.error('Error al obtener documentos: ', error);
@@ -126,9 +136,7 @@ const MisCursos = ({ navigation, usuario }) => {
                 backgroundColor='white'
               />
               <View style={styles.containerBoton}>
-                <TouchableOpacity style={[styles.button,styles.eliminar]} onPress={() => {
-                  eliminarCurso(cursoSeleccionado);
-                }}>
+                <TouchableOpacity style={[styles.button, styles.eliminar]} onPress={()=>abrirModal2()}>
                   <Text style={styles.buttonText}>🗑 Eliminar</Text>
                 </TouchableOpacity>
 
@@ -140,10 +148,37 @@ const MisCursos = ({ navigation, usuario }) => {
           </View>
         </Modal>
       )}
+      {modalBaja && (
+        <Modal
+          animationType='slide'
+          transparent={true}
+          visible={modalBaja}
+          onRequestClose={()=>cerrarModal2()}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Seguro de Eliminar Curso</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.button]}
+                  onPress={()=>cerrarModal2()}
+                >
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.eliminar]}
+                  onPress={() => eliminarCurso(cursoSeleccionado)}
+                >
+                  <Text style={styles.buttonText}>Confirmar Baja</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </>
   );
 };
-
 export default MisCursos;
 
 const styles = StyleSheet.create({
@@ -213,8 +248,8 @@ const styles = StyleSheet.create({
   },
   containerBoton: {
     flexDirection: 'row',
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '80%',
   },
   button: {
@@ -232,8 +267,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  eliminar:{
-    backgroundColor:'red'
-  }
+  eliminar: {
+    backgroundColor: 'red'
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    alignContent:'center',
+    justifyContent:'center',
+    marginTop: 15,
+    width: '80%',
+},
 }
 );

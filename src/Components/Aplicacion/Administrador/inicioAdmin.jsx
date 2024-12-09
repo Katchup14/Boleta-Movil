@@ -1,11 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/Ionicons'; // Importa los íconos
+import Icon from 'react-native-vector-icons/Ionicons'; 
 import { NavigationContainer } from '@react-navigation/native';
 import EditarPerfil from '../Docente/EditarPerfil';
 import ConsultaEst from './ConsultaEst';
 import ConsultaDoc from './ConsultaDoc';
+import RegistrarAdmin from './RegistrarAdmin';
 
 
 const TabNavigator = ({ usuario }) => {
@@ -58,6 +59,18 @@ const InicioAdmin = ({ usuario, signout }) => {
                 >
                     {() => <EditarPerfil usuario={usuario} />}
                 </Drawer.Screen>
+
+                <Drawer.Screen
+                    name='Registrar Administrador'
+                    options={{
+                        drawerIcon: ({ color, size }) => (
+                            <Icon name='create-outline' size={size} color={color} />
+                        ),
+                    }}
+                >
+                    {() => <RegistrarAdmin usuario={usuario} />}
+                </Drawer.Screen>
+
                 <Drawer.Screen
                     name='Cerrar Sesión'
                     options={{

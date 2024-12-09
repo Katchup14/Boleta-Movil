@@ -203,7 +203,6 @@ export default function RegisterForm({
             <Picker.Item label=' Rol' value='' />
             <Picker.Item label='Docente' value='Docente' />
             <Picker.Item label='Estudiante' value='Estudiante' />
-            <Picker.Item label='Administrador' value='Administrador' />
           </Picker>
         </View>
         <View style={styles.pickerContainer}>

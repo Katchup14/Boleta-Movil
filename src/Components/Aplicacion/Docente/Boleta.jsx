@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, ScrollView, Button, Modal, TextInput } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, Button, Modal, TextInput, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import { db } from "./../../../utils/firebase.js";
 
@@ -8,6 +9,7 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
     const [alumnos, setAlumnos] = useState([])
     const [modalVisible, setModalVisible] = useState(false);
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
+    const [modalBaja, setModalBaja] = useState(false);
 
     useEffect(() => {
         const obtenerAlumnos = async () => {
@@ -34,8 +36,6 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
                         });
                     }
                 }
-
-                // Establecemos los datos de los alumnos en el estado
                 setAlumnos(alumnosData);
             } catch (error) {
                 console.error('Error al obtener los alumnos: ', error);
@@ -55,6 +55,15 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
         setAlumnoSeleccionado(null);
     };
 
+    const abrirModal2 = (alumno) => {
+        setAlumnoSeleccionado(alumno);
+        setModalBaja(true);
+    };
+
+    const cerrarModal2 = () => {
+        setModalBaja(false);
+        setAlumnoSeleccionado(null);
+    };
 
 
     const handleCalificacionChange = (index, value) => {
@@ -83,6 +92,18 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
         }
     }
 
+    const darDeBaja = async (cursoId) => {
+        try {
+            await deleteDoc(doc(db, 'curso_Inscrito', cursoId));
+            setAlumnos((prevAlumno) =>
+                prevAlumno.filter((curso) => curso.id !== cursoId)
+            );
+            cerrarModal2();
+        } catch (error) {
+            console.error('Error al dar de baja el curso: ', error);
+        }
+    };
+
 
 
     return (
@@ -90,16 +111,16 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
             <View style={styles.container}>
                 <View style={styles.boton} color="#007BFF" // Cambia el color si es necesario
                 >
-                    <Button
-                        title="Regresar"
-                        onPress={() => { setBoleta(false) }}
-                    />
+                    <TouchableOpacity style={styles.button} onPress={() => { setBoleta(false) }}>
+                        <Icon name="arrow-back-outline" size={20} color="#fff" style={styles.icon} />
+                    </TouchableOpacity>
                 </View>
                 <Text style={styles.title}>Lista de Estudiantes</Text>
                 <View style={styles.tableHeader}>
                     <Text style={[styles.headerText, styles.numeroLista]}>#</Text>
                     <Text style={[styles.headerText, styles.nombre]}>Nombre Completo</Text>
                     <Text style={[styles.headerText, styles.calificaciones]}>Calificaciones</Text>
+                    <Text style={[styles.headerText, styles.calificaciones]}>Baja</Text>
                 </View>
                 <ScrollView>
                     {alumnos.map((item, index) => (
@@ -109,13 +130,15 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
                                 {item.Nombre} {item.Apellido_Paterno} {item.Apellido_Materno}
                             </Text>
                             <View style={[styles.cell, styles.calificaciones, styles.buttonContainer]}>
-                                <Button
-                                    title="Ver"
-                                    onPress={() => { abrirModal(item) }}
-                                    color="#007BFF" // Cambia el color si es necesario
-                                />
+                                <TouchableOpacity style={[styles.button, styles.botonCalif]} onPress={() => { abrirModal(item) }}>
+                                    <Icon name="list-outline" size={20} color="#fff" style={styles.icon} />
+                                </TouchableOpacity>
                             </View>
-
+                            <View style={[styles.cell, styles.calificaciones, styles.buttonContainer]}>
+                                <TouchableOpacity style={[styles.button, styles.botonBaja]} onPress={() => { abrirModal2(item) }}>
+                                    <Icon name="trash-outline" size={20} color="#fff" style={styles.icon} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     ))}
                 </ScrollView>
@@ -144,14 +167,57 @@ const Boleta = ({ cursoSeleccionado, setBoleta }) => {
                                     </View>
                                 ))}
                             </View>
-                            <View style={styles.row}>
-                                <Button title="Guardar" onPress={() => actualizarCal()} />
-                                <Button title="Cerrar" onPress={cerrarModal} />
+                            <View style={styles.containerBoton}>
+                                <TouchableOpacity style={[styles.button, styles.botonCalif]} onPress={() => {
+                                    actualizarCal();
+                                }}>
+                                    <Text style={[styles.buttonText]}>🗑 Editar</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.button} onPress={cerrarModal}>
+                                    <Text style={styles.buttonText}>Cerrar</Text>
+                                </TouchableOpacity>
                             </View>
 
                         </View>
                     </View>
 
+                </Modal>
+            )}
+            {modalBaja && (
+                <Modal
+                    animationType='slide'
+                    transparent={true}
+                    visible={modalBaja}
+                    onRequestClose={cerrarModal2}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Eliminar Alumno</Text>
+                            <Text style={styles.modalText}>
+                                <Text style={{ fontWeight: 'bold' }}>Curso: {cursoSeleccionado.Nombre} </Text>
+
+                            </Text>
+                            <Text style={styles.modalText}>
+                                <Text style={{ fontWeight: 'bold' }}>Nombre: {alumnoSeleccionado.Nombre} {alumnoSeleccionado.Apellido_Paterno} {alumnoSeleccionado.Apellido_Materno}</Text>
+
+                            </Text>
+                            <View style={styles.modalButtonContainer}>
+                                <TouchableOpacity
+                                    style={[styles.modalButton, styles.closeButton]}
+                                    onPress={cerrarModal2}
+                                >
+                                    <Text style={styles.buttonText}>Cerrar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.modalButton, styles.confirmButton]}
+                                    onPress={() => darDeBaja(alumnoSeleccionado.id_ins)}
+                                >
+                                    <Text style={styles.buttonText}>Confirmar Baja</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
                 </Modal>
             )}
         </>
@@ -182,6 +248,7 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
+        fontSize: 12,
     },
     tableRow: {
         flexDirection: 'row',
@@ -261,10 +328,57 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '70%'
     },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 15,
+        width: '100%',
+    },
     boton: {
         flexDirection: 'row',
         alignItems: 'center',
-
-        width: '40%', // Abarca todo el contenedor
+        width: '30%', // Abarca todo el contenedor
     },
+    button: {
+        backgroundColor: '#00509e',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 20,
+        alignItems: 'center',
+        alignContent: 'center',
+        marginVertical: 10,
+        width: '100%',
+        alignSelf: 'center',
+    },
+    buttonText: {
+        textAlign: 'center',
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    botonBaja: {
+        backgroundColor: '#FF4D4D', // Rojo vibrante
+    },
+    botonCalif: {
+        backgroundColor: '#FFC107', // Amarillo suave
+    },
+    closeButton: {
+        backgroundColor: '#808080', // Gris
+    },
+    confirmButton: {
+        backgroundColor: '#FF0000', // Rojo
+    },
+    modalButton: {
+        flex: 1,
+        padding: 10,
+        borderRadius: 10,
+        marginHorizontal: 5,
+        justifyContent: 'center',
+    },
+    containerBoton: {
+        flexDirection: 'row',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        width: '50%',
+      },
 });

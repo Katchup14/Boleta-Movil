@@ -126,13 +126,15 @@ const MisCursos = ({ navigation, usuario }) => {
                 backgroundColor='white'
               />
               <View style={styles.containerBoton}>
-                <Button
-                  title='Eliminar'
-                  onPress={() => {
-                    eliminarCurso(cursoSeleccionado);
-                  }}
-                />
-                <Button title='Cerrar' onPress={cerrarModal} />
+                <TouchableOpacity style={[styles.button,styles.eliminar]} onPress={() => {
+                  eliminarCurso(cursoSeleccionado);
+                }}>
+                  <Text style={styles.buttonText}>🗑 Eliminar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={cerrarModal}>
+                  <Text style={styles.buttonText}>Cerrar</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -210,12 +212,28 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   containerBoton: {
-    marginTop: '5%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '80%',
+  },
+  button: {
+    backgroundColor: '#00509e',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginVertical: 10,
     width: '70%',
+    alignSelf: 'center',
   },
-  botonEliminar: {
-    backgroundColor: 'red',
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
-});
+  eliminar:{
+    backgroundColor:'red'
+  }
+}
+);

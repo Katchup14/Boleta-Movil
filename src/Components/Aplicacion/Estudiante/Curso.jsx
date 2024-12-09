@@ -7,6 +7,7 @@ export default function Curso({ curso, usuario, setCursos }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
 
+
   const abrirModal = (curso) => {
     setCursoSeleccionado(curso);
     setModalVisible(true);

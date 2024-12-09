@@ -7,6 +7,7 @@ import MisCursos from './MisCursos';
 import CrearCurso from './CrearCurso';
 import VerEstudiante from './VerEstudiante';
 import EditarPerfil from './EditarPerfil';
+import EditarCursos from './EditarCursos';
 
 const TabNavigator = ({ usuario }) => {
   const Tab = createBottomTabNavigator();
@@ -55,6 +56,7 @@ const InicioDoc = ({ usuario, signout }) => {
           name='Inicio'
           children={() => <TabNavigator usuario={usuario} />}
         />
+
         <Drawer.Screen
           name='Editar Perfil'
           options={{
@@ -64,6 +66,17 @@ const InicioDoc = ({ usuario, signout }) => {
           }}
         >
           {() => <EditarPerfil usuario={usuario} />}
+        </Drawer.Screen>
+
+        <Drawer.Screen
+          name='Editar Cursos'
+          options={{
+            drawerIcon: ({ color, size }) => (
+              <Icon name='school-outline' size={size} color={color} />
+            ),
+          }}
+        >
+          {() => <EditarCursos usuario={usuario} />}
         </Drawer.Screen>
         <Drawer.Screen
           name='Cerrar Sesión'
